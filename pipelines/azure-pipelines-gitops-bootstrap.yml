@@ -1,0 +1,42 @@
+trigger: none
+
+pr: none
+
+parameters:
+- name: gitopsRevision
+  type: string
+  default: main
+- name: gitopsRepoUrl
+  type: string
+  default: https://dev.azure.com/your-org/your-project/_git/openshift
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  ansibleInventory: ansible/inventory/hosts.yml
+
+stages:
+- stage: BootstrapGitOps
+  displayName: Bootstrap Argo CD and root applications
+  jobs:
+  - job: BootstrapAKS
+    displayName: Install Argo CD and register apps
+    steps:
+    - checkout: self
+
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: "3.11"
+
+    - script: |
+        python -m pip install --upgrade pip
+        pip install ansible-core
+        ansible-galaxy collection install kubernetes.core
+      displayName: Install Ansible dependencies
+
+    - script: |
+        ansible-playbook -i $(ansibleInventory) ansible/playbooks/bootstrap-argocd.yml \
+          -e gitops_repo_url='${{ parameters.gitopsRepoUrl }}' \
+          -e gitops_revision='${{ parameters.gitopsRevision }}'
+      displayName: Bootstrap Argo CD

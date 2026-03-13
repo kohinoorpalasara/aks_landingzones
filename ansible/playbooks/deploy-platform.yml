@@ -1,0 +1,8 @@
+- name: Deploy shared platform add-ons
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - aks-login
+    - external-secrets
+    - reloader
+    - twistlock

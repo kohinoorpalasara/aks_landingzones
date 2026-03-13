@@ -1,0 +1,69 @@
+- name: Ensure Argo CD namespace exists
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ argocd_namespace }}"
+
+- name: Install Argo CD
+  kubernetes.core.helm:
+    name: argocd
+    chart_ref: argo/argo-cd
+    chart_version: "{{ argocd_chart_version }}"
+    release_namespace: "{{ argocd_namespace }}"
+    create_namespace: false
+    release_values: "{{ argocd_values }}"
+    update_repo_cache: true
+
+- name: Apply Argo CD project
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: argoproj.io/v1alpha1
+      kind: AppProject
+      metadata:
+        name: platform-addons
+        namespace: "{{ argocd_namespace }}"
+      spec:
+        description: Platform add-ons managed through GitOps
+        sourceRepos:
+          - "*"
+        destinations:
+          - namespace: external-secrets
+            server: https://kubernetes.default.svc
+          - namespace: reloader
+            server: https://kubernetes.default.svc
+          - namespace: argocd
+            server: https://kubernetes.default.svc
+        clusterResourceWhitelist:
+          - group: "*"
+            kind: "*"
+
+- name: Apply Argo CD root application
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: argoproj.io/v1alpha1
+      kind: Application
+      metadata:
+        name: platform-root
+        namespace: "{{ argocd_namespace }}"
+      spec:
+        project: platform-addons
+        source:
+          repoURL: "{{ gitops_repo_url }}"
+          targetRevision: "{{ gitops_revision }}"
+          path: gitops/argocd/apps
+          directory:
+            recurse: true
+        destination:
+          server: https://kubernetes.default.svc
+          namespace: "{{ argocd_namespace }}"
+        syncPolicy:
+          automated:
+            prune: true
+            selfHeal: true
+          syncOptions:
+            - CreateNamespace=true

@@ -1,0 +1,6 @@
+- name: Bootstrap Argo CD on AKS
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - aks-login
+    - argocd

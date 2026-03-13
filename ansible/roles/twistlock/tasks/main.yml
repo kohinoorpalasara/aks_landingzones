@@ -1,0 +1,17 @@
+- name: Ensure security namespace exists
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: twistlock
+
+- name: Install Prisma Cloud Defenders placeholder release
+  kubernetes.core.helm:
+    name: twistlock-defender
+    chart_ref: prisma/twistlock-defender
+    release_namespace: twistlock
+    create_namespace: false
+    update_repo_cache: true
+  ignore_errors: true

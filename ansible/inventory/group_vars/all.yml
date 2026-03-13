@@ -1,0 +1,13 @@
+aks_resource_group: rg-aks-platform
+aks_cluster_name: aks-platform
+azure_subscription_id: 00000000-0000-0000-0000-000000000000
+helm_chart_root: "{{ playbook_dir }}/../../helm"
+kubernetes_root: "{{ playbook_dir }}/../../kubernetes"
+environments:
+  - dev
+  - sit
+  - svt
+  - nfr
+  - prod
+gitops_repo_url: https://dev.azure.com/your-org/your-project/_git/openshift
+gitops_revision: main

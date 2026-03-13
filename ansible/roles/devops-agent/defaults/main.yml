@@ -1,0 +1,21 @@
+agent_tools:
+  - git
+  - curl
+  - unzip
+  - jq
+  - python3-pip
+  - apt-transport-https
+  - ca-certificates
+  - gnupg
+  - lsb-release
+
+azure_cli_install_script: https://aka.ms/InstallAzureCLIDeb
+terraform_version: 1.8.5
+kubectl_version: v1.30.4
+helm_version: v3.15.4
+kubelogin_version: v0.1.4
+argocd_version: v2.12.3
+azure_devops_agent_version: 3.248.0
+azure_devops_agent_root: /opt/azure-devops-agents
+azure_devops_work_folder: /opt/azure-devops-work
+azure_devops_agent_prefix: aks-platform

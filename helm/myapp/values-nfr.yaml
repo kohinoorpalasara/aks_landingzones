@@ -1,0 +1,17 @@
+image:
+  repository: myacr.azurecr.io/myapp
+  tag: nfr
+
+replicaCount: 4
+
+resources:
+  requests:
+    cpu: "1"
+    memory: 1Gi
+  limits:
+    cpu: 1800m
+    memory: 2Gi
+
+ingress:
+  enabled: true
+  host: nfr.app.company.com

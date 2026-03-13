@@ -1,0 +1,8 @@
+- name: Apply Kubernetes YAML assets for one environment
+  hosts: localhost
+  gather_facts: false
+  vars:
+    target_environment: "{{ env | default('dev') }}"
+  roles:
+    - aks-login
+    - yaml-deploy

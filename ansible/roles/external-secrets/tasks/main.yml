@@ -1,0 +1,16 @@
+- name: Ensure external-secrets namespace exists
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: external-secrets
+
+- name: Install External Secrets operator
+  kubernetes.core.helm:
+    name: external-secrets
+    chart_ref: external-secrets/external-secrets
+    release_namespace: external-secrets
+    create_namespace: false
+    update_repo_cache: true

@@ -1,0 +1,50 @@
+trigger: none
+
+pr: none
+
+parameters:
+- name: agentHostLimit
+  type: string
+  default: devops_agents
+- name: agentPool
+  type: string
+  default: aks-platform-linux
+- name: environmentName
+  type: string
+  default: shared
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  ansibleInventory: ansible/inventory/hosts.yml
+  agentOrgUrl: $(AZDO_ORG_URL)
+  agentPat: $(AZDO_AGENT_PAT)
+
+stages:
+- stage: ConfigureLinuxAgents
+  displayName: Configure Linux DevOps agents
+  jobs:
+  - job: BootstrapAgents
+    displayName: Install toolchain and register agents
+    steps:
+    - checkout: self
+
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: "3.11"
+
+    - script: |
+        python -m pip install --upgrade pip
+        pip install ansible-core
+        ansible-galaxy collection install kubernetes.core
+      displayName: Install Ansible dependencies
+
+    - script: |
+        ansible-playbook -i $(ansibleInventory) ansible/playbooks/deploy-devops-agent.yml \
+          --limit ${{ parameters.agentHostLimit }} \
+          -e target_agent_pool='${{ parameters.agentPool }}' \
+          -e target_environment='${{ parameters.environmentName }}' \
+          -e azure_devops_org_url='$(agentOrgUrl)' \
+          -e azure_devops_pat='$(agentPat)'
+      displayName: Configure self-hosted agents

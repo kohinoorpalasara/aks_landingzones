@@ -1,0 +1,17 @@
+image:
+  repository: myacr.azurecr.io/myapp
+  tag: prod
+
+replicaCount: 5
+
+resources:
+  requests:
+    cpu: 1000m
+    memory: 1Gi
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+
+ingress:
+  enabled: true
+  host: app.company.com

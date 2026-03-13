@@ -1,0 +1,16 @@
+- name: Apply cluster secret store
+  kubernetes.core.k8s:
+    state: present
+    src: "{{ kubernetes_root }}/cluster-secret-store.yaml"
+
+- name: Apply namespace manifests
+  kubernetes.core.k8s:
+    state: present
+    src: "{{ item }}"
+  loop:
+    - "{{ kubernetes_root }}/{{ target_environment }}/namespace.yaml"
+    - "{{ kubernetes_root }}/{{ target_environment }}/quota.yaml"
+    - "{{ kubernetes_root }}/{{ target_environment }}/limitrange.yaml"
+    - "{{ kubernetes_root }}/{{ target_environment }}/networkpolicy.yaml"
+    - "{{ kubernetes_root }}/{{ target_environment }}/externalsecret.yaml"
+    - "{{ kubernetes_root }}/{{ target_environment }}/ingress.yaml"

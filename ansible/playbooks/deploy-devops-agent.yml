@@ -1,0 +1,6 @@
+- name: Configure Linux Azure DevOps agents
+  hosts: devops_agents
+  gather_facts: true
+  become: false
+  roles:
+    - devops-agent

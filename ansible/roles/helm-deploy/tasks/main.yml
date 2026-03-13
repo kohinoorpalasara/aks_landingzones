@@ -1,0 +1,8 @@
+- name: Deploy Helm release for environment
+  kubernetes.core.helm:
+    name: "{{ release_name | default('myapp') }}"
+    chart_ref: "{{ helm_chart_root }}/myapp"
+    release_namespace: "{{ target_environment }}"
+    create_namespace: false
+    values_files:
+      - "{{ helm_chart_root }}/myapp/values-{{ target_environment }}.yaml"

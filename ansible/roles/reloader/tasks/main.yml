@@ -1,0 +1,16 @@
+- name: Ensure reloader namespace exists
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: reloader
+
+- name: Install stakater reloader
+  kubernetes.core.helm:
+    name: reloader
+    chart_ref: stakater/reloader
+    release_namespace: reloader
+    create_namespace: false
+    update_repo_cache: true

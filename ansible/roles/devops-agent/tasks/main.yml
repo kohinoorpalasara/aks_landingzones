@@ -1,0 +1,129 @@
+- name: Validate Azure DevOps agent inputs
+  ansible.builtin.assert:
+    that:
+      - azure_devops_org_url is defined
+      - azure_devops_pat is defined
+      - target_agent_pool is defined
+    fail_msg: Azure DevOps organization URL, PAT, and agent pool are required.
+
+- name: Install base OS packages
+  become: true
+  ansible.builtin.apt:
+    name: "{{ agent_tools }}"
+    state: present
+    update_cache: true
+
+- name: Install Ansible Python package
+  become: true
+  ansible.builtin.pip:
+    name:
+      - ansible-core
+      - kubernetes
+      - openshift
+
+- name: Install Azure CLI
+  become: true
+  ansible.builtin.shell: curl -sL {{ azure_cli_install_script }} | bash
+  args:
+    creates: /usr/bin/az
+
+- name: Install Terraform
+  become: true
+  ansible.builtin.unarchive:
+    src: "https://releases.hashicorp.com/terraform/{{ terraform_version }}/terraform_{{ terraform_version }}_linux_amd64.zip"
+    dest: /usr/local/bin
+    remote_src: true
+    mode: "0755"
+    include:
+      - terraform
+
+- name: Install kubectl
+  become: true
+  ansible.builtin.get_url:
+    url: "https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl"
+    dest: /usr/local/bin/kubectl
+    mode: "0755"
+
+- name: Install Helm
+  become: true
+  ansible.builtin.unarchive:
+    src: "https://get.helm.sh/helm-{{ helm_version }}-linux-amd64.tar.gz"
+    dest: /tmp
+    remote_src: true
+    creates: /tmp/linux-amd64/helm
+
+- name: Copy Helm binary
+  become: true
+  ansible.builtin.copy:
+    src: /tmp/linux-amd64/helm
+    dest: /usr/local/bin/helm
+    remote_src: true
+    mode: "0755"
+
+- name: Install kubelogin
+  become: true
+  ansible.builtin.unarchive:
+    src: "https://github.com/Azure/kubelogin/releases/download/{{ kubelogin_version }}/kubelogin-linux-amd64.zip"
+    dest: /tmp/kubelogin
+    remote_src: true
+    creates: /tmp/kubelogin/bin/linux_amd64/kubelogin
+
+- name: Copy kubelogin binary
+  become: true
+  ansible.builtin.copy:
+    src: /tmp/kubelogin/bin/linux_amd64/kubelogin
+    dest: /usr/local/bin/kubelogin
+    remote_src: true
+    mode: "0755"
+
+- name: Install Argo CD CLI
+  become: true
+  ansible.builtin.get_url:
+    url: "https://github.com/argoproj/argo-cd/releases/download/{{ argocd_version }}/argocd-linux-amd64"
+    dest: /usr/local/bin/argocd
+    mode: "0755"
+
+- name: Create Azure DevOps agent directories
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ azure_devops_agent_root }}"
+    - "{{ azure_devops_work_folder }}"
+
+- name: Download Azure DevOps agent package
+  become: true
+  ansible.builtin.unarchive:
+    src: "https://vstsagentpackage.azureedge.net/agent/{{ azure_devops_agent_version }}/vsts-agent-linux-x64-{{ azure_devops_agent_version }}.tar.gz"
+    dest: "{{ azure_devops_agent_root }}"
+    remote_src: true
+    creates: "{{ azure_devops_agent_root }}/config.sh"
+
+- name: Configure Azure DevOps agent
+  become: true
+  ansible.builtin.command:
+    cmd: >-
+      ./config.sh --unattended
+      --agent {{ azure_devops_agent_prefix }}-{{ inventory_hostname }}
+      --url {{ azure_devops_org_url }}
+      --auth pat
+      --token {{ azure_devops_pat }}
+      --pool {{ target_agent_pool }}
+      --work {{ azure_devops_work_folder }}
+      --replace
+  args:
+    chdir: "{{ azure_devops_agent_root }}"
+    creates: "{{ azure_devops_agent_root }}/.agent"
+
+- name: Install and start Azure DevOps agent service
+  become: true
+  ansible.builtin.command:
+    cmd: "{{ item }}"
+  args:
+    chdir: "{{ azure_devops_agent_root }}"
+  loop:
+    - ./svc.sh install
+    - ./svc.sh start
+  changed_when: true

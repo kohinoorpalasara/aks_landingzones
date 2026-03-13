@@ -1,0 +1,8 @@
+- name: Get AKS credentials
+  ansible.builtin.command:
+    cmd: >-
+      az aks get-credentials
+      --resource-group {{ aks_resource_group }}
+      --name {{ aks_cluster_name }}
+      --overwrite-existing
+  changed_when: false

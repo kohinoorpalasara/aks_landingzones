@@ -1,0 +1,10 @@
+- name: Deploy a single environment to AKS
+  hosts: localhost
+  gather_facts: false
+  vars:
+    target_environment: "{{ env | default('dev') }}"
+    release_name: myapp
+  roles:
+    - aks-login
+    - yaml-deploy
+    - helm-deploy
