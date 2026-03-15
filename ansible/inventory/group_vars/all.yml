@@ -8,5 +8,5 @@ environments:
   - tst
   - preprod
   - prod
-gitops_repo_url: https://dev.azure.com/your-org/your-project/_git/openshift
+gitops_repo_url: https://dev.azure.com/your-org/your-project/_git/aks_landingzones
 gitops_revision: main
