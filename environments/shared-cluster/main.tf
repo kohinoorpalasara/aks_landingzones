@@ -1,5 +1,5 @@
 locals {
-  environments = ["dev", "sit", "svt", "nfr", "prod"]
+  environments = ["dev", "tst", "preprod", "prod"]
 }
 
 resource "azurerm_resource_group" "platform" {

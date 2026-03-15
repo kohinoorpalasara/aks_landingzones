@@ -1,6 +1,6 @@
 image:
   repository: myacr.azurecr.io/myapp
-  tag: nfr
+  tag: preprod
 
 replicaCount: 4
 
@@ -14,4 +14,4 @@ resources:
 
 ingress:
   enabled: true
-  host: nfr.app.company.com
+  host: preprod.app.company.com

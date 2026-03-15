@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: LimitRange
 metadata:
-  name: svt-defaults
-  namespace: svt
+  name: tst-defaults
+  namespace: tst
 spec:
   limits:
   - type: Container
     default:
-      cpu: "1"
-      memory: 1Gi
+      cpu: 750m
+      memory: 768Mi
     defaultRequest:
-      cpu: 500m
-      memory: 512Mi
+      cpu: 300m
+      memory: 384Mi

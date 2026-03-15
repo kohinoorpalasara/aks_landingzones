@@ -4,7 +4,7 @@ This repository provisions a shared AKS platform with Terraform and deploys envi
 
 ## Architecture
 
-- Single AKS cluster with `dev`, `sit`, `svt`, `nfr`, and `prod` namespaces.
+- Single AKS cluster with `dev`, `tst`, `preprod`, and `prod` namespaces.
 - Azure Application Gateway Ingress Controller for host-based routing.
 - Azure Key Vault with External Secrets for environment-isolated secrets.
 - Azure Monitor / Log Analytics for namespace-aware logging.
@@ -81,4 +81,4 @@ ContainerLogV2
 - Replace the placeholder `tenant_id`, subscription ID, image repository, and hostnames before deployment.
 - Replace the placeholder Azure DevOps repo URL in the Argo CD application YAMLs before syncing GitOps.
 - The Helm chart directory expects a deployable chart at `helm/myapp`.
-- If environments become highly regulated or very large, split `prod` and `nfr` into a dedicated production cluster.
+- If environments become highly regulated or very large, split `prod` and `preprod` into a dedicated production cluster.

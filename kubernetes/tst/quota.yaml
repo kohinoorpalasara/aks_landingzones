@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: ResourceQuota
 metadata:
-  name: sit-quota
-  namespace: sit
+  name: tst-quota
+  namespace: tst
 spec:
   hard:
     requests.cpu: "6"

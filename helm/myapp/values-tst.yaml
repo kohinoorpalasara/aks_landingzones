@@ -1,6 +1,6 @@
 image:
   repository: myacr.azurecr.io/myapp
-  tag: sit
+  tag: tst
 
 replicaCount: 2
 
@@ -14,4 +14,4 @@ resources:
 
 ingress:
   enabled: true
-  host: sit.app.company.com
+  host: tst.app.company.com

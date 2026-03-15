@@ -5,9 +5,8 @@ helm_chart_root: "{{ playbook_dir }}/../../helm"
 kubernetes_root: "{{ playbook_dir }}/../../kubernetes"
 environments:
   - dev
-  - sit
-  - svt
-  - nfr
+  - tst
+  - preprod
   - prod
 gitops_repo_url: https://dev.azure.com/your-org/your-project/_git/openshift
 gitops_revision: main
